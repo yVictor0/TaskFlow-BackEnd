@@ -130,150 +130,89 @@ app.delete('/tarefas/:id', (req, res) => {
 })
 
 
-app.use((req,res)=>{
-    res.status(404).json({
-        erro: 'EI PAI, TEM ESSA ROTA N VISSE',
-        metodo:req.method,
-        caminho: req.url
-    })
-})
 
 
 
 
-app.listen(PORTA, (req, res)=>{
-    console.log(`Server Rodando em http://localhost:${PORTA}` + setInterval(girando, 100))
-})
+let usuarios = [{ id: 1, nome: 'admin', email: 'admin@taskflow.com', senha: '1234' },];
 
-const express = require('express')
-const app = express()
-const PORTA = 3000
-
-const frames = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘']
-let i = 0
-let proximaId = 4  
-
-const tarefas = [
-
-{ id: 1, texto: 'Estudar Node', prioridade: 'alta', coluna: 'afazer' },
-
-{ id: 2, texto: 'Criar API', prioridade: 'alta', coluna: 'andamento' },
-
-{ id: 3, texto: 'Testar Postman',prioridade: 'media', coluna: 'concluido' },
-
-];
+let proximoIdUsuario = 2;
 
 
-const girando = () => {
-    process.stdout.write(`\r${frames[i]}`) /*precisa ter o \r se n fica repetindo a string em `` e n vai sobreescrever o texto anterior*/
-    i = (i+1)% frames.length
-}
-
-app.use(express.json())
-
-app.get('/ok', (req, res) =>{
-    res.json({status: 'ok', dados: ['1','2','3']})
-})
-
-
-app.get('/erro', (req, res) =>{
-    res.status(400).json({erro: 'Dados invalidos'})
-})
-
-
-app.get('/criado', (req, res) =>{
-    res.status(201).json({mensagem: 'Criado om sucesso'})
-})
-
-app.get('/texto', (req, res) =>{
-    res.send('Resposta em texto simples');
-})
-
-
-app.get('/', (req, res) =>{
-    res.json({api: 'TaskFlow', versao: '1.0', status: 'online'});
-})
-
-// app.get('/tarefas', (req, res) =>{
-//     res.json(tarefas);
-// })
-
-app.get('/tarefas/:id', (req, res) =>{
+app.get('/usuarios/:id', (req, res) =>{
 
     const id = Number(req.params.id)
-    const tarefa = tarefas.find(t => t.id === id)
-    if(!tarefa){
-        return res.status(404).json({erro:'nao achei essa tarefa pai'})
+    const usuario = usuarios.find(t => t.id === id)
+    if(!usuario){
+        return res.status(404).json({erro:'nao achei esse usuario pai'})
     }
-    res.json(tarefa);
+    res.json(usuario);
 })
 
 //filtro p achar apenas coisas especifica
-app.get('/tarefas', (req, res) =>{
+app.get('/usuarios', (req, res) =>{
 
-    const {coluna, prioridade} = req.query
-    let resultado = tarefas
-    if(coluna){
-        resultado = resultado.filter(t => t.coluna === coluna)
+    const {nome, email} = req.query
+    let resultado = usuarios
+    if(nome){
+        resultado = resultado.filter(t => t.nome === nome)
     }
-
-    if(prioridade){
-        resultado = resultado.filter(t =>t.prioridade === prioridade)
+    if(email){
+        resultado = resultado.filter(t => t.email === email)
     }
     res.json(resultado);
 })  
 
 
 
-app.post('/tarefas', (req, res) => {
-    const { texto, prioridade, coluna, cidade } = req.body
-    const novaTarefa ={
-        id: proximaId++,
-        texto: texto,
-        prioridade: prioridade || 'media',  
-        coluna: coluna || 'afazer',
-        cidade: cidade || '',
+app.post('/usuarios', (req, res) => {
+    const { nome, email, senha} = req.body
+    const novoUsuario ={
+        id: proximoIdUsuario++,
+        nome: nome,
+        email: email || '',  
+        senha: senha || ''
     }
-tarefas.push(novaTarefa)
-res.status(201).json(novaTarefa)
+usuarios.push(novoUsuario)
+res.status(201).json(novoUsuario)
 })
  
 
-app.put('/tarefas/:id', (req, res) => {
+app.put('/usuarios/:id', (req, res) => {
    
 
     const id = Number(req.params.id)
 
-    const  { texto, prioridade, coluna, cidade } = req.body || {}
+    const  { nome, email, senha } = req.body
 
-    const indice = tarefas.findIndex(t => t.id === id)
+    const indice = usuarios.findIndex(t => t.id === id)
        
     if (indice === -1){
       
         return res.status(404).json({ erro: 'não foi possivel acahr essa tarefa'})
     }
   
-    const tarefasAtualizada = { id, texto, prioridade, coluna, cidade }
-    tarefas[indice] = tarefasAtualizada
+    const usuariosAtualizado = { id, nome, email, senha }
+    usuarios[indice] = usuariosAtualizado
 
-    res.json(tarefasAtualizada)
+    res.json(usuariosAtualizado)
     
 })
 
 
 
-app.delete('/tarefas/:id', (req, res) => {
+app.delete('/usuarios/:id', (req, res) => {
     console.log('pass ✅')
     const id = Number(req.params.id)
 
-    const index = tarefas.findIndex(t => t.id === id)
+    const index = usuarios.findIndex(t => t.id === id)
 
     if (index === -1) {
         return res.status(404).json({ erro: 'essa tarefa nao existe' })
     }
-    tarefas.splice(index, 1)
+    usuarios.splice(index, 1)
 
-    res.json({ menssagem: 'Tarefa Deletada Com Sucesso', id })
+    res.json({ menssagem: 'Usuario Deletada Com Sucesso', id })
 })
 
 
