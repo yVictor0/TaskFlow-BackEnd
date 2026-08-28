@@ -202,7 +202,7 @@ app.put('/usuarios/:id', (req, res) => {
 
 
 app.delete('/usuarios/:id', (req, res) => {
-    console.log('pass ✅')
+    // console.log('pass ✅')
     const id = Number(req.params.id)
 
     const index = usuarios.findIndex(t => t.id === id)
@@ -215,6 +215,21 @@ app.delete('/usuarios/:id', (req, res) => {
     res.json({ menssagem: 'Usuario Deletada Com Sucesso', id })
 })
 
+
+app.get('/estatisticas', (req, res) => {
+    // console.log('pass')
+    const tarefasCont = tarefas.length
+    const aaa = Object.entries(tarefas).sort((coluna) => coluna) 
+    const TarefasColunas = { 
+        "afazer": '',
+        "andamento":'',
+        "concluida":''
+    }
+    console.log(aaa)
+    
+    res.json({mensagem: 
+        `VOCE TEM ${tarefasCont} TAREFAS NO TOTAL EM COLUNAS É: ${aaa}`})
+})
 
 app.use((req,res)=>{
     res.status(404).json({
