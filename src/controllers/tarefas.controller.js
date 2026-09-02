@@ -69,6 +69,8 @@ const TarefasController = {
        
     // },
 
+
+
    resumoTarefas(req, res) {
     const { coluna, formato } = req.query;
     const base = coluna ? tarefas.filter(t => t.coluna === coluna) : tarefas;
@@ -90,7 +92,9 @@ const TarefasController = {
         filtroAplicado: coluna,
         porColuna
     });
-}
+    }
+    //quebra  cabeça ^
+
 }
 
 module.exports = TarefasController;
