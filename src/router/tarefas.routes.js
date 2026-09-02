@@ -7,10 +7,10 @@ const TarefasController = require('../controllers/tarefas.controller')
 
 router.get('/estatisticas', tarefasController.estatisticas);
 
-router.get('/', TarefasController) 
-router.get('/:id', buscarPorId) //funcao > buscarPorId
-router.post('/', criarTarefas)
-router.put('/:id', atualizarTarefas);
-router.delete('/:id', excluirTarefas)
+router.get('/', TarefasController.listar) 
+router.get('/:id', TarefasController.buscarPorId) //funcao > buscarPorId
+router.post('/', TarefasController.criarTarefas)
+router.put('/:id', TarefasController.atualizarTarefas);
+router.delete('/:id', TarefasController.excluirTarefas)
 
 module.exports = router;
