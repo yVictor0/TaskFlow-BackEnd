@@ -1,8 +1,6 @@
 const express = require('express');
-
 const tarefasR = require('./src/router/tarefas.routes');
 const usuariosR = require('./src/router/usuarios.routes');
-
 const app = express();
 
 app.use(express.json());
