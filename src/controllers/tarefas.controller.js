@@ -1,5 +1,14 @@
-let tarefas = [];
-let proximoId = 1;
+let tarefas = [
+    {
+    "id": 1,
+    "texto": "",
+    "prioridade": "media",
+    "coluna": "afazer"
+    },
+];
+
+let arefa = tarefas
+let proximoId = 2;
 
 const TarefasController = { 
 
@@ -23,7 +32,7 @@ const TarefasController = {
 
         const nova = { 
             id: proximoId++, 
-            texto, 
+            texto: '', 
             prioridade: prioridade || 'media', 
             coluna: coluna || 'afazer' 
         };
@@ -49,16 +58,39 @@ const TarefasController = {
         res.json({ mensagem: 'Tarefa removida', tarefa: removida });
     },
 
-    estatisticas(req, res) {
-        const { coluna } = req.query;
-        const base = coluna ? tarefas.filter(t => t.coluna === coluna) : tarefas;
-        const porColuna = {
-            afazer: base.filter(t => t.coluna === 'afazer').length,
-            andamento: base.filter(t => t.coluna === 'andamento').length,
-            concluido: base.filter(t => t.coluna === 'concluido').length,
-        };
-        res.json({ total: base.length, porColuna });
+    // estatisticas(req, res) {
+    //     const { coluna } = req.query;
+    //     const base = coluna ? tarefas.filter(t => t.coluna === coluna) : tarefas;
+    //     const porColuna = {
+    //         afazer: base.filter(t => t.coluna === 'afazer').length,
+    //         andamento: base.filter(t => t.coluna === 'andamento').length,
+    //         concluido: base.filter(t => t.coluna === 'concluido').length,
+    //     };
+       
+    // },
+
+   resumoTarefas(req, res) {
+    const { coluna, formato } = req.query;
+    const base = coluna ? tarefas.filter(t => t.coluna === coluna) : tarefas;
+    const porColuna = {
+        afazer: base.filter(t => t.coluna === 'afazer').length,
+        andamento: base.filter(t => t.coluna === 'andamento').length,
+        concluido: base.filter(t => t.coluna === 'concluido').length,
+    };
+
+    if (formato === 'texto') {
+        const textoColuna = coluna ? ` na coluna "${coluna}"` : '';
+        return res.send(
+            `Você tem ${base.length} tarefas${textoColuna}. ${porColuna.concluido} concluídas, ${porColuna.andamento} em andamento e ${porColuna.afazer} a fazer.`
+        );
     }
-};
+
+    return res.json({
+        total: base.length,
+        filtroAplicado: coluna,
+        porColuna
+    });
+}
+}
 
 module.exports = TarefasController;
