@@ -1,7 +1,6 @@
-const { Router } = require('express');
+const express = require('express');
+const router = express.Router();
 const projetosController = require('../controllers/projetos.controller');
-
-const router = Router();
 
 router.get('/', projetosController.listarProjetos);
 router.get('/:id', projetosController.projetosId);

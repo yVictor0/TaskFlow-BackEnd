@@ -13,13 +13,11 @@ const projetosController = {
     },
 
     adicionarNovoProjeto(req, res) {
-        const { nome, descricao } = req.body;
-        if (!nome) return res.status(400).json({ erro: 'O nome do projeto é obrigatório' });
-
+        const { descricao } = req.body;
         const novoProjeto = {
             id: proximoId++,
-            nome,
-            descricao: descricao || ''
+            descricao,
+           ativo: req.body.ativo !== undefined ? req.body.ativo : true
         };
 
         projetos.push(novoProjeto);

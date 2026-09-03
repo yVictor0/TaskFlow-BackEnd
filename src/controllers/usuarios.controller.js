@@ -1,76 +1,49 @@
-let tarefas = [];
+let usuarios = [];
 let proximoId = 1;
 
-const projetoController = {
-    listarTarefas(req, res) {
-        const { coluna } = req.query;
-        if (coluna) {
-            const filtradas = tarefas.filter(t => t.coluna === coluna);
-            return res.json(filtradas);
-        }
-        res.json(tarefas);
+const usuariosController = {
+    listarUsuarios(req, res) {
+        res.json(usuarios);
     },
 
-    tarefasId(req, res) {
-        const tarefa = tarefas.find(t => t.id === parseInt(req.params.id));
-        if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada' });
-        res.json(tarefa);
+    usuariosId(req, res) {
+        const usuario = usuarios.find(u => u.id === parseInt(req.params.id));
+        if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+        res.json(usuario);
     },
 
-    adicionarNovaTarefa(req, res) {
-        const { titulo, descricao, coluna } = req.body;
-        if (!titulo) return res.status(400).json({ erro: 'O título é obrigatório' });
+    adicionarNovoUsuario(req, res) {
+        const { nome, email } = req.body;
+        if (!nome) return res.status(400).json({ erro: 'O nome do usuário é obrigatório' });
+        if (!email) return res.status(400).json({ erro: 'O e-mail do usuário é obrigatório' });
 
-        const novaTarefa = {
+        const novoUsuario = {
             id: proximoId++,
-            titulo,
-            descricao: descricao || '',
-            coluna: coluna || 'afazer'
+            nome,
+            email,
         };
 
-        tarefas.push(novaTarefa);
-        res.status(201).json(novaTarefa);
+        usuarios.push(novoUsuario);
+        res.status(201).json(novoUsuario);
     },
 
-    atualizarTarefa(req, res) {
+    atualizarUsuario(req, res) {
         const id = parseInt(req.params.id);
-        const idx = tarefas.findIndex(t => t.id === id);
-        if (idx === -1) return res.status(404).json({ erro: 'Tarefa não encontrada' });
+        const idx = usuarios.findIndex(u => u.id === id);
+        if (idx === -1) return res.status(404).json({ erro: 'Usuário não encontrado' });
 
-        tarefas[idx] = { ...tarefas[idx], ...req.body, id: tarefas[idx].id };
-        res.json(tarefas[idx]);
+        usuarios[idx] = { ...usuarios[idx], ...req.body, id: usuarios[idx].id };
+        res.json(usuarios[idx]);
     },
 
-    excluirTarefa(req, res) {
+    excluirUsuario(req, res) {
         const id = parseInt(req.params.id);
-        const idx = tarefas.findIndex(t => t.id === id);
-        if (idx === -1) return res.status(404).json({ erro: 'Não achei essa tarefa pae' });
+        const idx = usuarios.findIndex(u => u.id === id);
+        if (idx === -1) return res.status(404).json({ erro: 'Usuário não encontrado' });
 
-        const removido = tarefas.splice(idx, 1)[0];
-        res.json({ mensagem: 'Tarefa removida', tarefa: removido });
-    },
-
-    resumoTarefas(req, res) {
-        const { coluna, formato } = req.query;
-        const base = coluna ? tarefas.filter(t => t.coluna === coluna) : tarefas;
-
-        const porColuna = {
-            afazer: base.filter(t => t.coluna === 'afazer').length,
-            andamento: base.filter(t => t.coluna === 'andamento').length,
-            concluido: base.filter(t => t.coluna === 'concluido').length,
-        };
-
-        if (formato === 'texto') {
-            const textoColuna = coluna ? ` na coluna "${coluna}"` : '';
-            return res.send(
-                `Você tem ${base.length} tarefas${textoColuna}. ${porColuna.concluido} concluídas, ${porColuna.andamento} em andamento e ${porColuna.afazer} a fazer.`
-            );
-        }
-
-        res.json({
-            total: base.length,  filtroAplicado: coluna || 'nenhum',  porColuna
-        });
+        const removido = usuarios.splice(idx, 1)[0];
+        res.json({ mensagem: 'Usuário removido com sucesso', usuario: removido });
     }
 };
 
-module.exports = projetoController;
+module.exports = usuariosController;
