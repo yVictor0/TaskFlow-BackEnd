@@ -1,27 +1,47 @@
 
-const tarefaModel = require('../models/models/tarefas.model.js')
+const tarefaModel = require('../models/tarefas.model.js');
 
 const TarefasController = { 
 
     listar(req, res) {
         const { coluna } = req.query
         let resultado = coluna
-        ? tarefaModel.ListarPorColuna(coluna)
+        ? tarefaModel.listarPorColuna(coluna)
         : tarefaModel.listar()
         res.json(resultado)
+
     },
 
     buscarPorId(req, res) {
+
         const tarefa = tarefaModel.buscar(parseInt(req.params.id))
         if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada' })
         res.json(tarefa);
     },
 
     criarTarefa(req, res) {
-        const { texto } = req.body
-        if (!texto) return res.status(400).json({ erro: 'precisa adicionar um texto' })
-        res.status(201).json(nova);
-    },
+    try {
+        // Recebe o usuarioId (junto com os outros campos) do BODY
+        const { texto, prioridade, coluna, usuarioId } = req.body;
+
+        if (!texto) {
+            return res.status(400).json({ erro: 'precisa adicionar um texto' });
+        }
+
+        // Tenta adicionar no model
+        const novaTarefa = tarefaModel.adicionar({ texto, prioridade, coluna, usuarioId });
+
+        return res.status(201).json(novaTarefa);
+
+    } catch (error) {
+        // Captura o erro disparado caso o usuarioId informado seja inválido
+        if (error.status === 400) {
+            return res.status(400).json({ erro: error.message });
+        }
+
+        return res.status(500).json({ erro: 'Erro interno no servidor' });
+    }
+},
 
     atualizarTarefas(req, res) {
         const atualizada = tarefaModel.atualizarTarefas(parseInt(req.params.id))
