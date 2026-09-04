@@ -34,4 +34,4 @@ module.export = {
         return tarefas.splice(idx, 1)[0]
     }
 
-};
+}

@@ -16,24 +16,23 @@ module.exports = {
     buscarPorEmail: (email) => usuarios.find(u => u.email === email),
 
     adicionar: ({ nome, email }) => {
-        const novo = { id: proximoId++, nome, email };
-        usuarios.push(novo);
-        return novo;
-
+        const novo = { id: proximoId++, nome, email }
+        usuarios.push(novo)
+        return novo
     },
 
     atualizar: (id, dados) => {
-        const idx = usuarios.findIndex(u => u.id === id);
-        if (idx === -1) return null;
-        usuarios[idx] = { ...usuarios[idx], ...dados, id };
-        return usuarios[idx];
+        const idx = usuarios.findIndex(u => u.id === id)
+        if (idx === -1) return null
+        usuarios[idx] = { ...usuarios[idx], ...dados, id }
+        return usuarios[idx]
     },
 
     remover: (id) => {
         const idx = usuarios.findIndex(u => u.id === id)
-        if (idx === -1) return null;
-        return usuarios.splice(idx, 1)[0];
+        if (idx === -1) return null
+        return usuarios.splice(idx, 1)[0]
 
     },
 
-};
+}
