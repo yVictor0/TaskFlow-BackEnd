@@ -1,9 +1,7 @@
-let tarfeas = [{
-    id: 1, texto: "estudar Node.js", prioridade :"alta", coluna: "andamento"
-},
-{
-    id: 2, texto: "fazer ativadede", prioridade :"media", coluna: "afazer"
-}]
+let tarefas = [
+    {id: 1, texto: "estudar Node.js", prioridade :"alta", coluna: "andamento"},
+    {id: 2, texto: "fazer ativadede", prioridade :"media", coluna: "afazer"}
+]
 
 let proximoID = 3
 
@@ -21,5 +19,19 @@ module.export = {
             coluna: coluna || 'afazer'}
         tarefas.push(nova)
         return nova
+    },
+
+    atualizar: (id, dados) => { 
+        const idx = tarefas.findIndex(t => t.id === id) 
+        if(idx === -1) return null
+        tarefas[idx] = {... tarefas[idx], ...dados. id}
+        return tarefas[idx]
+    },
+
+    remover:() => {
+        const idx = tarefas.findIndex( t => t.id === id)
+        if(idx === -1) return null
+        return tarefas.splice(idx, 1)[0]
     }
-}
+
+};
