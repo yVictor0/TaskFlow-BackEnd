@@ -17,21 +17,17 @@ module.exports = {
     buscar: (id) => tarefas.find (t => t.id === id),
 
    adicionar: ({ texto, prioridade, coluna, usuarioId }) => {
-    let usuarioEncontrado = null;
+    const usuarioEncontrado = null;
+    
 
-    // 1. Apenas valida se o usuarioId tiver sido informado (opcional)
     if (usuarioId !== undefined && usuarioId !== null) {
         usuarioEncontrado = usuarioModel.buscar(usuarioId);
-
-        // Se informou o usuarioId mas ele NÃO existe no banco -> Erro 400
         if (!usuarioEncontrado) {
             const erro = new Error('Usuário não encontrado');
             erro.status = 400;
             throw erro;
         }
     }
-
-    // 2. Cria a tarefa (usuarioId será o ID se existir, ou null/undefined se não foi passado)
     const nova = {
         id: proximoId++,
         texto,
@@ -39,6 +35,7 @@ module.exports = {
         coluna: coluna || 'afazer',
         usuarioId: usuarioEncontrado ? usuarioEncontrado.id : null
     };
+    // if(coluna !== coluna) return console.log("aa")
 
     tarefas.push(nova);
     return nova;

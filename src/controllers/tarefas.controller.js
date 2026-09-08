@@ -1,5 +1,7 @@
-
 const tarefaModel = require('../models/tarefas.model.js');
+
+const prioridadeValidas = ['media','alta','baixa' ]
+
 
 const TarefasController = { 
 
@@ -21,25 +23,26 @@ const TarefasController = {
 
     criarTarefa(req, res) {
     try {
-        // Recebe o usuarioId (junto com os outros campos) do BODY
         const { texto, prioridade, coluna, usuarioId } = req.body;
 
         if (!texto) {
             return res.status(400).json({ erro: 'precisa adicionar um texto' });
         }
+        if(prioridade && !prioridadeValidas.includes(prioridade)){
+            console.log()
+            return res.status(400).json({ erro: 'esse tipo de prioridade nao existe' });
+        }
 
-        // Tenta adicionar no model
         const novaTarefa = tarefaModel.adicionar({ texto, prioridade, coluna, usuarioId });
 
         return res.status(201).json(novaTarefa);
 
     } catch (error) {
-        // Captura o erro disparado caso o usuarioId informado seja inválido
         if (error.status === 400) {
             return res.status(400).json({ erro: error.message });
         }
 
-        return res.status(500).json({ erro: 'Erro interno no servidor' });
+
     }
 },
 
