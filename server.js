@@ -29,7 +29,7 @@ app.use((req, res) => {
     res.status(404).json({ erro: 'Não encontrada' });
 });
 
-const PORT = 3000;
+const PORT = process.env.PORTA;
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
