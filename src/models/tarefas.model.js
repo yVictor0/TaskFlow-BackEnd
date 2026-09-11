@@ -35,8 +35,6 @@ module.exports = {
         coluna: coluna || 'afazer',
         usuarioId: usuarioEncontrado ? usuarioEncontrado.id : null
     };
-    // if(coluna !== coluna) return console.log("aa")
-
     tarefas.push(nova);
     return nova;
 },

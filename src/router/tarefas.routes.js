@@ -1,13 +1,26 @@
-const express = require('express')
-const router = express.Router()
-const TarefasController = require('../controllers/tarefas.controller')
+const express = require('express');
+const router = express.Router();
 
-router.get('/estatisticas', TarefasController.resumoTarefas)
-router.get('/resumo', TarefasController.resumoTarefas)
-router.get('/', TarefasController.listar)
-router.get('/:id', TarefasController.buscarPorId)
-router.post('/', TarefasController.criarTarefa)
-router.put('/:id', TarefasController.atualizarTarefas)
-router.delete('/:id', TarefasController.excluirTarefas)
+const validar = require('../middlewares/validar');
+const schemas = require('../middlewares/schemas');
+const TarefasController = require('../controllers/tarefas.controller');
 
-module.exports = router
+router.get('/estatisticas', TarefasController.resumoTarefas);
+router.get('/resumo', TarefasController.resumoTarefas);
+router.get('/', TarefasController.listar);
+router.get('/:id', TarefasController.buscarPorId);
+
+router.post(
+    '/', 
+    validar(schemas.tarefa), 
+    TarefasController.criarTarefa 
+);
+
+router.put(
+    '/:id',
+    validar(schemas.tarefa),
+    TarefasController.atualizarTarefas
+)
+router.delete('/:id', TarefasController.excluirTarefas);
+
+module.exports = router;
