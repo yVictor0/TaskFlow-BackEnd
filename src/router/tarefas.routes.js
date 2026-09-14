@@ -4,6 +4,7 @@ const router = express.Router();
 const validar = require('../middlewares/validar');
 const schemas = require('../middlewares/schemas');
 const TarefasController = require('../controllers/tarefas.controller');
+const autenticar = require('../middlewares/autenticar');
 
 router.get('/estatisticas', TarefasController.resumoTarefas);
 router.get('/resumo', TarefasController.resumoTarefas);
