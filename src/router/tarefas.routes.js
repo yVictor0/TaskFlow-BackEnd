@@ -19,8 +19,8 @@ router.post(
 router.put(
     '/:id',
     validar(schemas.tarefa),
-    TarefasController.atualizarTarefas
+    autenticar, TarefasController.atualizarTarefas
 )
-router.delete('/:id', TarefasController.excluirTarefas);
+router.delete('/:id', autenticar, TarefasController.excluirTarefas);
 
 module.exports = router;
