@@ -1,2 +1,2 @@
-const app = require('../server'); // Importa o server.js
+const app = require('../server');
 module.exports = app;

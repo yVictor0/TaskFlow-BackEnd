@@ -41,7 +41,6 @@ app.use((req, res) => {
 });
 
 // 5. INICIALIZAÇÃO DO SERVIDOR
-// Use apenas uma porta principal para evitar subir duas instâncias da mesma aplicação
 const PORT = process.env.PORTA || 3001;
 
 app.listen(PORT, () => {

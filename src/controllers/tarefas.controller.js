@@ -22,7 +22,6 @@ const TarefasController = {
         try {
             const { texto, prioridade, coluna, usuarioId } = req.body;
 
-            // O middleware de validação já faz grande parte disso, mas mantendo a lógica de fallback:
             if (!texto) {
                 return res.status(400).json({ erro: 'precisa adicionar um texto' });
             }
@@ -42,7 +41,6 @@ const TarefasController = {
     },
 
     atualizarTarefas(req, res) {
-        // Passa o ID e os dados enviados no body
         const atualizada = tarefaModel.atualizar(parseInt(req.params.id), req.body);
         if (!atualizada) return res.status(404).json({ erro: 'Tarefa não encontrada' });
         res.json(atualizada);
