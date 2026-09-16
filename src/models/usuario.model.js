@@ -1,11 +1,11 @@
 let usuarios = [
 
 { id: 1, nome: 'Ana', email: 'ana@email.com', senha: '123456' },
-{ id: 2, nome: 'Bruno', email: 'bruno@email.com', senha: '123456' },
-{ id: 1, nome: 'Alice', email: 'alice@email.com', senha: '123456' },
+{ id: 2, nome: 'Bruno', email: 'yan@gmail.com', senha: '123' },
+{ id: 3, nome: 'Alice', email: 'alice@email.com', senha: '123456' },
 ];
 
-let proximoId = 3;
+let proximoId = 4;
 
 module.exports = {
 
