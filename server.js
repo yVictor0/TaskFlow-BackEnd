@@ -16,7 +16,7 @@ const app = express();
 
 // 1. MIDDLEWARES GLOBAIS (Devem vir antes de TODAS as rotas)
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173', 
+  origin: process.env.CORS_ORIGIN, 
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
