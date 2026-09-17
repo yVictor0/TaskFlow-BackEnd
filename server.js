@@ -41,7 +41,7 @@ app.use((req, res) => {
 });
 
 // 5. INICIALIZAÇÃO DO SERVIDOR
-const PORT = process.env.PORTA || 3001;
+const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
