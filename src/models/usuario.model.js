@@ -4,7 +4,7 @@ let usuarios = [
 { id: 2, nome: 'Yan', email: 'yan@gmail.com', senha: '123' },
 ];
 
-let proximoId = 4;
+let proximoId = 3;
 
 module.exports = {
 
