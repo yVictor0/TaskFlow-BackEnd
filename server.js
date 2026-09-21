@@ -14,33 +14,27 @@ const autenticar = require('./src/middlewares/autenticar');
 
 const app = express();
 
-// 1. MIDDLEWARES GLOBAIS (Devem vir antes de TODAS as rotas)
 app.use(cors({
   origin: process.env.CORS_ORIGIN, 
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// OBRIGATÓRIO: Converte o body JSON para req.body
 app.use(express.json());
 
 app.use(logger);
 app.use(validarContentType);
 
-// 2. ROTAS PÚBLICAS (Sem autenticação)
 app.use('/auth', authRouters);
 
-// 3. ROTAS PROTEGIDAS (Com middleware de autenticação)
 app.use('/tarefas', autenticar, tarefasR);
 app.use('/usuarios', autenticar, usuariosR);
 app.use('/projetos', autenticar, projetosR);
 
-// 4. TRATAMENTO DE ROTA NÃO ENCONTRADA (404)
 app.use((req, res) => {
     res.status(404).json({ erro: 'Não encontrada' });   
 });
 
-// 5. INICIALIZAÇÃO DO SERVIDOR
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {

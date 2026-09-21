@@ -2,8 +2,9 @@ const { usuariosId } = require("../controllers/usuarios.controller");
 const usuarioModel = require("./usuario.model")
 
 let tarefas = [
-    {id: 1, texto: "estudar Node.js", prioridade :"alta", coluna: "andamento"},
-    {id: 2, texto: "fazer ativadede", prioridade :"media", coluna: "afazer"}
+    {id: 1, texto: "estudar Node.js", prioridade :"Alta 🔴", coluna: "afazer"},
+    {id: 2, texto: "fazer ativadede", prioridade :"Média 🟡", coluna: "afazer"},
+    {id: 3, texto: "fazer comidas", prioridade :"Baixa 🟢", coluna: "afazer"}
 ]
 
 let proximoId = 3
@@ -17,7 +18,7 @@ module.exports = {
     buscar: (id) => tarefas.find (t => t.id === id),
 
    adicionar: ({ texto, prioridade, coluna, usuarioId }) => {
-    const usuarioEncontrado = null;
+    let usuarioEncontrado = null;
     
 
     if (usuarioId !== undefined && usuarioId !== null) {

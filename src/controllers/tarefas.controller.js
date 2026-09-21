@@ -1,6 +1,6 @@
 const tarefaModel = require('../models/tarefas.model.js');
 
-const prioridadeValidas = ['media', 'alta', 'baixa'];
+const prioridadeValidas = ['Alta 🔴', 'Média 🟡', 'Baixa 🟢'];
 
 const TarefasController = { 
 
