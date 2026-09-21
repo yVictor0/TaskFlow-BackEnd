@@ -1,13 +1,9 @@
 const { usuariosId } = require("../controllers/usuarios.controller");
 const usuarioModel = require("./usuario.model")
 
-let tarefas = [
-    {id: 1, texto: "estudar Node.js", prioridade :"Alta 🔴", coluna: "afazer"},
-    {id: 2, texto: "fazer ativadede", prioridade :"Média 🟡", coluna: "afazer"},
-    {id: 3, texto: "fazer comidas", prioridade :"Baixa 🟢", coluna: "afazer"}
-]
+let tarefas = []
 
-let proximoId = 3
+let proximoId = 1
 
 
 module.exports = {
