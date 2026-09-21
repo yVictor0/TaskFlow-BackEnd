@@ -34,13 +34,10 @@ const TarefasController = {
                 return res.status(400).json({ erro: 'esse tipo de prioridade nao existe' });
             }
 
-            // 1. Busca todas as tarefas cadastradas no model
             const todasTarefas = tarefaModel.listar();
 
-            // 2. Identifica se a tarefa está sendo criada para a coluna de andamento
             const ehEmAndamento = coluna === 'andamento' || coluna === 'emAndamento';
 
-            // 3. SE for para "Em Andamento", conta APENAS as tarefas nessa coluna para este usuário
             if (ehEmAndamento) {
                 const tarefasEmAndamento = todasTarefas.filter(
                     t => t.usuarioId === usuarioId && (t.coluna === 'andamento' || t.coluna === 'emAndamento')
@@ -66,7 +63,6 @@ const TarefasController = {
         const idTarefa = parseInt(req.params.id);
         const { coluna } = req.body;
 
-        // Se a requisição tentar mover a tarefa para a coluna "Em Andamento"
         const ehEmAndamento = coluna === 'andamento' || coluna === 'emAndamento';
 
         if (ehEmAndamento) {
@@ -74,7 +70,6 @@ const TarefasController = {
             const tarefaAtual = tarefaModel.buscar(idTarefa);
 
             if (tarefaAtual) {
-                // Conta quantas tarefas o usuário já tem em andamento (desconsiderando a própria tarefa que está sendo editada)
                 const tarefasEmAndamento = todasTarefas.filter(
                     t => t.usuarioId === tarefaAtual.usuarioId && 
                          t.id !== idTarefa && 
