@@ -3,31 +3,27 @@ const tarefaModel = require("../models/tarefas.model.js");
 const prioridadeValidas = ["Alta 🔴", "Média 🟡", "Baixa 🟢"];
 
 const TarefasController = {
-  async listar(req, res) {
-    try {
-      const { coluna, usuario_id, usuarioId } = req.query;
-      // Dá prioridade ao req.user.id (caso use Middleware JWT/Auth) ou ao parâmetro informado
-      const idUsuario = req.user?.id || usuario_id || usuarioId;
+ async listar(req, res) {
+  try {
+    const { coluna, usuario_id, usuarioId } = req.query;
+    
+    // Se não vier nenhum ID na requisição, usa o ID 12 como padrão
+    const idUsuario = req.user?.id || usuario_id || usuarioId || 12;
 
-      if (!idUsuario) {
-        return res.status(400).json({ erro: "O id do usuário é obrigatório para listar as tarefas." });
-      }
+    let resultado = await tarefaModel.listarPorUsuario(idUsuario);
 
-      // NUNCA listamos tudo do banco. Buscamos APENAS do usuário informado
-      let resultado = await tarefaModel.listarPorUsuario(idUsuario);
-
-      if (coluna) {
-        resultado = resultado.filter(
-          (t) => t.coluna && t.coluna.toLowerCase() === coluna.toLowerCase(),
-        );
-      }
-
-      return res.json(resultado);
-    } catch (error) {
-      console.error("Erro ao listar tarefas:", error);
-      return res.status(500).json({ erro: "Erro interno ao listar tarefas" });
+    if (coluna) {
+      resultado = resultado.filter(
+        (t) => t.coluna && t.coluna.toLowerCase() === coluna.toLowerCase(),
+      );
     }
-  },
+
+    return res.json(resultado);
+  } catch (error) {
+    console.error("Erro ao listar tarefas:", error);
+    return res.status(500).json({ erro: "Erro interno ao listar tarefas" });
+  }
+},
 
   async buscarPorId(req, res) {
     try {
