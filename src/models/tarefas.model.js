@@ -1,51 +1,74 @@
-const { usuariosId } = require("../controllers/usuarios.controller");
-const usuarioModel = require("./usuario.model")
-
-let tarefas = []
-
-let proximoId = 1
-
+const pool = require("../database/db");
 
 module.exports = {
-    listar: () => tarefas,
+  listar: async () => {
+    const result = await pool.query("SELECT * FROM tarefas ORDER BY id ASC");
+    return result.rows;
+  },
 
-    listarPorColuna: (coluna) => tarefas.filter(t => t.coluna === coluna),
+  listarPorUsuario: async (usuario_id) => {
+    const result = await pool.query(
+      "SELECT * FROM tarefas WHERE usuario_id = $1 ORDER BY ordem ASC, id ASC",
+      [usuario_id]
+    );
+    return result.rows;
+  },
 
-    buscar: (id) => tarefas.find (t => t.id === id),
+  buscar: async (id) => {
+    const result = await pool.query("SELECT * FROM tarefas WHERE id = $1", [id]);
+    return result.rows[0] || null;
+  },
 
-   adicionar: ({ texto, prioridade, coluna, usuarioId }) => {
-    let usuarioEncontrado = null;
-    
+  adicionar: async ({ texto, coluna, ordem, usuario_id, projeto_id, prioridade_id }) => {
+    const query = `
+      INSERT INTO tarefas (texto, coluna, ordem, usuario_id, projeto_id, prioridade_id) 
+      VALUES ($1, $2, $3, $4, $5, $6) 
+      RETURNING *;
+    `;
+    const values = [
+      texto,
+      coluna || "A Fazer",
+      ordem || 1,
+      usuario_id,
+      projeto_id,
+      prioridade_id || null
+    ];
 
-    if (usuarioId !== undefined && usuarioId !== null) {
-        usuarioEncontrado = usuarioModel.buscar(usuarioId);
-        if (!usuarioEncontrado) {
-            const erro = new Error('Usuário não encontrado');
-            erro.status = 400;
-            throw erro;
-        }
-    }
-    const nova = {
-        id: proximoId++,
-        texto,
-        prioridade: prioridade || 'media',
-        coluna: coluna || 'afazer',
-        usuarioId: usuarioEncontrado ? usuarioEncontrado.id : null
-    };
-    tarefas.push(nova);
-    return nova;
-},
-    atualizar: (id, dados) => { 
-        const idx = tarefas.findIndex(t => t.id === id) 
-        if(idx === -1) return null
-        tarefas[idx] = {... tarefas[idx], ...dados, id}
-        return tarefas[idx]
-    },
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  },
 
-    remover:(id) => {
-        const idx = tarefas.findIndex( t => t.id === id)
-        if(idx === -1) return null
-        return tarefas.splice(idx, 1)[0]
-    }
+  atualizar: async (id, dados) => {
+    const { texto, coluna, ordem, projeto_id, prioridade_id, concluida_em } = dados;
 
-}
+    const sql = `
+      UPDATE tarefas 
+      SET texto = COALESCE($1, texto),
+          coluna = COALESCE($2, coluna),
+          ordem = COALESCE($3, ordem),
+          projeto_id = COALESCE($4, projeto_id),
+          prioridade_id = COALESCE($5, prioridade_id),
+          concluida_em = COALESCE($6, concluida_em)
+      WHERE id = $7
+      RETURNING *;
+    `;
+
+    const valores = [
+      texto || null,
+      coluna || null,
+      ordem || null,
+      projeto_id || null,
+      prioridade_id || null,
+      concluida_em || null,
+      id
+    ];
+
+    const result = await pool.query(sql, valores);
+    return result.rows[0] || null;
+  },
+
+  remover: async (id) => {
+    const result = await pool.query("DELETE FROM tarefas WHERE id = $1 RETURNING *", [id]);
+    return result.rows[0] || null;
+  }
+};

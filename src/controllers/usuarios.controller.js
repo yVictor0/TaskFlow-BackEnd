@@ -1,37 +1,40 @@
-const usuarioModel = require('../models/usuario.model');
+const usuarioModel = require('../models/usuarios.model');
 
 const usuariosController = {
-    listarUsuarios(req, res) {
-        res.json(usuarioModel.listar());
+    async listarUsuarios(req, res) {
+        let teste = await usuarioModel.listar();
+        res.json(teste);
     },
 
-    usuariosId(req, res) {
+    async usuariosId(req, res) {
         const id = parseInt(req.params.id);
-        const usuario = usuarioModel.buscar(id);
+        const usuario = await usuarioModel.buscar(id);
         if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
         res.json(usuario);
     },
 
-    adicionarNovoUsuario(req, res) {
-        const { nome, email } = req.body;
-        if (!nome) return res.status(400).json({ erro: 'O nome do usuário é obrigatório' });
-        if (!email) return res.status(400).json({ erro: 'O e-mail do usuário é obrigatório' });
+    async adicionarNovoUsuario(req, res) {
+    const { nome, email, senha } = req.body;
 
-        const novoUsuario = usuarioModel.adicionar({ nome, email });
-        res.status(201).json(novoUsuario);
-    },
+    if (!nome) return res.status(400).json({ erro: 'O nome é obrigatório' });
+    if (!email) return res.status(400).json({ erro: 'O e-mail é obrigatório' });
+    if (!senha) return res.status(400).json({ erro: 'A senha é obrigatória' });
 
-    atualizarUsuario(req, res) {
+    const novoUsuario = await usuarioModel.adicionar({ nome, email, senha });
+    res.status(201).json(novoUsuario);
+},
+
+    async atualizarUsuario(req, res) {
         const id = parseInt(req.params.id);
-        const usuarioAtualizado = usuarioModel.atualizar(id, req.body);
+        const usuarioAtualizado = await usuarioModel.atualizar(id, req.body);
         if (!usuarioAtualizado) return res.status(404).json({ erro: 'Usuário não encontrado' });
 
         res.json(usuarioAtualizado);
     },
 
-    excluirUsuario(req, res) {
+    async excluirUsuario(req, res) {
         const id = parseInt(req.params.id);
-        const removido = usuarioModel.remover(id);
+        const removido = await usuarioModel.remover(id);
         if (!removido) return res.status(404).json({ erro: 'Usuário não encontrado' });
 
         res.json({ mensagem: 'Usuário removido com sucesso', usuario: removido });
