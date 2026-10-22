@@ -1,48 +1,37 @@
-function validar(schema) {
-    return function(req, res, next) {
-        const erros = [];
+function validar(schema, origem = "body") {
+  return function (req, res, next) {
+    const dados = req[origem] || {};
+    const erros = [];
 
-        for (const campo in schema) {
-            const regras = schema[campo];
-            const valor = req.body[campo];
-            const ausente = valor === undefined || valor === null || valor === "";
+    for (const campo in schema) {
+      const regras = schema[campo];
+      const valor = dados[campo];
+      const ausente = valor === undefined || valor === null || valor === "";
 
-            if (regras.obrigatorio && ausente) {
-                erros.push(`O campo '${campo}' é obrigatório`);
-            }
+      if (regras.obrigatorio && ausente) {
+        erros.push(`O campo '${campo}' é obrigatório.`);
+        continue;
+      }
 
-            if (!ausente) {
-                if (regras.tipo && typeof valor !== regras.tipo) {
-                    erros.push(`O campo '${campo}' deve ser do tipo ${regras.tipo}`);
-                }
+      if (ausente) continue;
 
-                if (regras.enum && !regras.enum.includes(valor)) {
-                    erros.push(`O campo '${campo}' deve ser um de: ${regras.enum.join(', ')}`);
-                }
-
-                if (regras.formato === 'email') {
-                    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!re.test(valor)) {
-                        erros.push(`O campo '${campo}' deve ser um email válido`);
-                    }
-                }
-
-                if (regras.minLength && typeof valor === 'string' && valor.length < regras.minLength) {
-                    erros.push(`O campo '${campo}' deve ter ao menos ${regras.minLength} caracteres`);
-                }
-
-                if (regras.maxLength && typeof valor === 'string' && valor.length > regras.maxLength) {
-                    erros.push(`O campo '${campo}' deve ter no máximo ${regras.maxLength} caracteres`);
-                }
-            }
+      if (regras.tipo === "inteiro") {
+        const numero = typeof valor === "string" ? Number(valor) : valor;
+        if (!Number.isInteger(numero) || numero <= 0) {
+          erros.push(`O campo '${campo}' deve ser um número inteiro positivo.`);
         }
+      } 
+      else if (regras.tipo && typeof valor !== regras.tipo) {
+        erros.push(`O campo '${campo}' deve ser do tipo ${regras.tipo}.`);
+      }
+    }
 
-        if (erros.length > 0) {
-            return res.status(400).json({ erros });
-        }
+    if (erros.length > 0) {
+      return res.status(400).json({ mensagem: erros.join(" | "), erros });
+    }
 
-        next();
-    };
+    next();
+  };
 }
 
 module.exports = validar;

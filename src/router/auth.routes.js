@@ -1,7 +1,8 @@
-const express = require('express')
-const router = express.Router()
-const authController = require('../controllers/auth.controller.js')
+const express = require('express');
+const router = express.Router();
+const authController = require('../controllers/auth.controller');
 
-router.post('/login', authController.login)
+// Oho derechote controller-pe
+router.post('/login', authController.login);
 
-module.exports = router
+module.exports = router;

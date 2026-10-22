@@ -16,7 +16,8 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "prisma": "^6.19.3"
   },
   "overrides": {
     "braces": "^3.0.3"

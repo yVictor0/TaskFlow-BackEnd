@@ -7,25 +7,27 @@ const authController = {
       const { email, senha } = req.body;
 
       if (!email || !senha) {
-        return res.status(400).json({ erro: 'E-mail e senha são obrigatórios' });
+        return res.status(400).json({ erro: 'E-mail e senha são obrigatórios.' });
       }
 
-      // 1. Busca o usuário no banco de dados
+      // Busca o utilizador no banco pelo e-mail
       const usuario = await usuarioModel.buscarPorEmail(email);
 
       if (!usuario) {
-        return res.status(401).json({ erro: 'Credenciais inválidas' });
+        return res.status(401).json({ erro: 'Credenciais inválidas.' });
       }
 
-      // 2. Valida a senha comparando com a coluna 'senha_hash' do banco
-      const senhaValida = (usuario.senha_hash && usuario.senha_hash === senha) || (usuario.senha && usuario.senha === senha);
+      // Converte a senha digitada e a senha do banco para string
+      const senhaDigitada = String(senha).trim();
+      const senhaBanco = String(usuario.senha_hash || usuario.senha || '').trim();
 
-      if (!senhaValida) {
-        return res.status(401).json({ erro: 'Credenciais inválidas' });
+      // Comparação direta em texto simples
+      if (senhaBanco === '' || senhaBanco !== senhaDigitada) {
+        return res.status(401).json({ erro: 'Credenciais inválidas.' });
       }
 
-      // 3. Gera o Token JWT
-      const secret = process.env.JWT_SECRET || 'secret_key_padrao';
+      // Gera o Token JWT
+      const secret = process.env.JWT_SECRET || 'chave_secreta_padrao_taskflow';
       const token = jwt.sign(
         { id: usuario.id, nome: usuario.nome },
         secret,
@@ -34,11 +36,15 @@ const authController = {
 
       return res.json({
         token,
-        usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email }
+        usuario: { 
+          id: usuario.id, 
+          nome: usuario.nome, 
+          email: usuario.email 
+        }
       });
     } catch (error) {
-      console.error('Erro no login:', error);
-      return res.status(500).json({ erro: 'Erro interno no servidor ao realizar login' });
+      console.error('ERRO NO LOGIN:', error);
+      return res.status(500).json({ erro: 'Erro interno no servidor ao realizar login.' });
     }
   }
 };
