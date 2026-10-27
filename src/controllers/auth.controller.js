@@ -10,23 +10,25 @@ const authController = {
         return res.status(400).json({ erro: 'E-mail e senha são obrigatórios.' });
       }
 
-      // Busca o utilizador no banco pelo e-mail
       const usuario = await usuarioModel.buscarPorEmail(email);
 
       if (!usuario) {
         return res.status(401).json({ erro: 'Credenciais inválidas.' });
       }
 
-      // Converte a senha digitada e a senha do banco para string
       const senhaDigitada = String(senha).trim();
       const senhaBanco = String(usuario.senha_hash || usuario.senha || '').trim();
 
-      // Comparação direta em texto simples
-      if (senhaBanco === '' || senhaBanco !== senhaDigitada) {
+      if (!senhaBanco) {
         return res.status(401).json({ erro: 'Credenciais inválidas.' });
       }
 
-      // Gera o Token JWT
+      const senhaValida = senhaBanco === senhaDigitada;
+
+      if (!senhaValida) {
+        return res.status(401).json({ erro: 'Credenciais inválidas.' });
+      }
+
       const secret = process.env.JWT_SECRET || 'chave_secreta_padrao_taskflow';
       const token = jwt.sign(
         { id: usuario.id, nome: usuario.nome },

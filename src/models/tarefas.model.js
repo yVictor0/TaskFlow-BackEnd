@@ -1,60 +1,66 @@
-const db = require('../database/db');
+const prisma = require("../database/prisma");
+
+const incluirNomes = {
+  projetos: { select: { nome: true } },
+  usuarios: { select: { nome: true } },
+  prioridades: { select: { descricao: true, cor: true } },
+};
+
+function formatarTarefa(tarefa) {
+  if (!tarefa) return null;
+
+  const { projetos, usuarios, prioridades, ...resto } = tarefa;
+
+  return {
+    ...resto,
+    projeto: projetos?.nome,
+    usuario: usuarios?.nome,
+    prioridade_nome: prioridades?.descricao,
+    prioridade_cor: prioridades?.cor,
+  };
+}
 
 const tarefasModel = {
-  async listar(usuario_id) {
-    const query = `
-      SELECT 
-        t.*, 
-        p.descricao AS prioridade_nome, 
-        p.cor AS prioridade_cor,
-        u.nome AS usuario_nome
-      FROM tarefas t
-      LEFT JOIN prioridades p ON t.prioridade_id = p.id
-      LEFT JOIN usuarios u ON t.usuario_id = u.id
-      WHERE t.usuario_id = $1
-      ORDER BY t.ordem ASC;
-    `;
-    const resultado = await db.query(query, [usuario_id]);
-    return resultado.rows;
+  listar: async () => {
+    const lista = await prisma.tarefas.findMany({
+      include: incluirNomes,
+      orderBy: { id: "asc" },
+    });
+    return lista.map(formatarTarefa);
+  },
+
+  buscar: async (id) => {
+    const tarefa = await prisma.tarefas.findUnique({
+      where: { id: Number(id) },
+      include: incluirNomes,
+    });
+
+    return formatarTarefa(tarefa);
   },
 
   async criar(dados) {
     const {
       texto,
-      coluna = 'afazer',
+      coluna = "afazer",
       ordem = 0,
       usuario_id,
       prioridade_id = 1,
-      projeto_id = null
+      projeto_id = null,
     } = dados;
 
-    const query = `
-      WITH tarefa_inserida AS (
-        INSERT INTO tarefas (texto, coluna, ordem, usuario_id, prioridade_id, projeto_id)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING *
-      )
-      SELECT 
-        t.*, 
-        p.descricao AS prioridade_nome, 
-        p.cor AS prioridade_cor,
-        u.nome AS usuario_nome
-      FROM tarefa_inserida t
-      LEFT JOIN prioridades p ON t.prioridade_id = p.id
-      LEFT JOIN usuarios u ON t.usuario_id = u.id;
-    `;
+    const novaTarefa = await prisma.tarefas.create({
+      data: {
+        texto,
+        coluna,
+        ordem,
+        usuario_id,
+        prioridade_id,
+        projeto_id,
+      },
+      include: incluirNomes,
+    });
 
-    const values = [
-      texto,
-      coluna,
-      ordem,
-      usuario_id,
-      prioridade_id,
-      projeto_id
-    ];
-
-    const resultado = await db.query(query, values);
-    return resultado.rows[0];
+    return formatarTarefa(novaTarefa);
   },
 
   async atualizar(id, dados) {
@@ -65,53 +71,33 @@ const tarefasModel = {
       usuario_id,
       prioridade_id,
       projeto_id,
-      concluida_em
+      concluida_em,
     } = dados;
 
-    const query = `
-      WITH tarefa_atualizada AS (
-        UPDATE tarefas 
-        SET 
-          texto = COALESCE($1, texto),
-          coluna = COALESCE($2, coluna),
-          ordem = COALESCE($3, ordem),
-          usuario_id = COALESCE($4, usuario_id),
-          prioridade_id = COALESCE($5, prioridade_id),
-          projeto_id = $6,
-          concluida_em = $7
-        WHERE id = $8
-        RETURNING *
-      )
-      SELECT 
-        t.*, 
-        p.descricao AS prioridade_nome, 
-        p.cor AS prioridade_cor,
-        u.nome AS usuario_nome
-      FROM tarefa_atualizada t
-      LEFT JOIN prioridades p ON t.prioridade_id = p.id
-      LEFT JOIN usuarios u ON t.usuario_id = u.id;
-    `;
+    const tarefaAtualizada = await prisma.tarefas.update({
+      where: { id: Number(id) },
+      data: {
+        ...(texto !== undefined && { texto }),
+        ...(coluna !== undefined && { coluna }),
+        ...(ordem !== undefined && { ordem }),
+        ...(usuario_id !== undefined && { usuario_id }),
+        ...(prioridade_id !== undefined && { prioridade_id }),
+        ...(projeto_id !== undefined && { projeto_id }),
+        ...(concluida_em !== undefined && { concluida_em }),
+      },
+      include: incluirNomes,
+    });
 
-    const values = [
-      texto !== undefined ? texto : null,
-      coluna !== undefined ? coluna : null,
-      ordem !== undefined ? ordem : null,
-      usuario_id !== undefined ? usuario_id : null,
-      prioridade_id !== undefined ? prioridade_id : null,
-      projeto_id !== undefined ? projeto_id : null,
-      concluida_em !== undefined ? concluida_em : null,
-      id
-    ];
-
-    const resultado = await db.query(query, values);
-    return resultado.rows[0];
+    return formatarTarefa(tarefaAtualizada);
   },
 
   async deletar(id) {
-    const query = 'DELETE FROM tarefas WHERE id = $1 RETURNING *;';
-    const resultado = await db.query(query, [id]);
-    return resultado.rows[0];
-  }
+    const tarefaDeletada = await prisma.tarefas.delete({
+      where: { id: Number(id) },
+    });
+
+    return tarefaDeletada;
+  },
 };
 
 module.exports = tarefasModel;

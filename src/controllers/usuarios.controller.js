@@ -3,8 +3,8 @@ const usuarioModel = require('../models/usuarios.model');
 const usuariosController = {
   async listarUsuarios(req, res) {
     try {
-      let teste = await usuarioModel.listar();
-      res.json(teste);
+      const usuarios = await usuarioModel.listar();
+      res.json(usuarios);
     } catch (error) {
       console.error('Erro ao listar usuários:', error);
       res.status(500).json({ erro: 'Erro interno no servidor ao listar usuários' });
@@ -19,7 +19,9 @@ const usuariosController = {
       }
 
       const usuario = await usuarioModel.buscar(id);
-      if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+      if (!usuario) {
+        return res.status(404).json({ erro: 'Usuário não encontrado' });
+      }
       
       res.json(usuario);
     } catch (error) {
@@ -57,9 +59,12 @@ const usuariosController = {
         return res.status(400).json({ erro: 'ID inválido' });
       }
 
-      const usuarioAtualizado = await usuarioModel.atualizar(id, req.body);
-      if (!usuarioAtualizado) return res.status(404).json({ erro: 'Usuário não encontrado' });
+      const usuarioExistente = await usuarioModel.buscar(id);
+      if (!usuarioExistente) {
+        return res.status(404).json({ erro: 'Usuário não encontrado' });
+      }
 
+      const usuarioAtualizado = await usuarioModel.atualizar(id, req.body);
       res.json(usuarioAtualizado);
     } catch (error) {
       console.error('Erro ao atualizar usuário:', error);
@@ -74,9 +79,12 @@ const usuariosController = {
         return res.status(400).json({ erro: 'ID inválido' });
       }
 
-      const removido = await usuarioModel.remover(id);
-      if (!removido) return res.status(404).json({ erro: 'Usuário não encontrado' });
+      const usuarioExistente = await usuarioModel.buscar(id);
+      if (!usuarioExistente) {
+        return res.status(404).json({ erro: 'Usuário não encontrado' });
+      }
 
+      const removido = await usuarioModel.remover(id);
       res.json({ mensagem: 'Usuário removido com sucesso', usuario: removido });
     } catch (error) {
       console.error('Erro ao excluir usuário:', error);

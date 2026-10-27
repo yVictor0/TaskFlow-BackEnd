@@ -1,33 +1,46 @@
-let projetos = []
-let proximoId = 1
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
 
 module.exports = {
+    listar: async () => {
+        return await prisma.projeto.findMany()
+    },
 
-    listar: () => projetos,
+    buscar: async (id) => {
+        return await prisma.projeto.findUnique({
+            where: { id: Number(id) }
+        })
+    },
 
-    buscar: (id) => projetos.find(p => p.id === id),
-
-    adicionar: ({ nome, descricao }) => {
-        const novo = {
-            id: proximoId++,
-            nome,
-            descricao: descricao || null,
+    adicionar: async ({ nome, descricao }) => {
+        return await prisma.projeto.create({
+            data: {
+                nome,
+                descricao: descricao || null
             }
-            projetos.push(novo)
-            return novo
-        },
-
-    atualizar: (id, dados) => {
-        const idx = projetos.findIndex(p => p.id === id)
-        if (idx === -1) return null
-        projetos[idx] = { ...projetos[idx], ...dados, id }
-        return projetos[idx]
+        })
     },
 
-    remover: (id) => {
-        const idx = projetos.findIndex(p => p.id === id)
-        if (idx === -1) return null
-        return projetos.splice(idx, 1)[0] 
+    atualizar: async (id, dados) => {
+        try {
+            return await prisma.projeto.update({
+                where: { id: Number(id) },
+                data: dados
+            })
+        } catch (error) {
+            if (error.code === 'P2025') return null
+            throw error
+        }
     },
 
+    remover: async (id) => {
+        try {
+            return await prisma.projeto.delete({
+                where: { id: Number(id) }
+            })
+        } catch (error) {
+            if (error.code === 'P2025') return null
+            throw error
+        }
+    }
 }

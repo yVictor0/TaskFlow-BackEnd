@@ -7,7 +7,7 @@ const tarefasController = {
       if (!usuario_id) {
         return res.status(400).json({ erro: 'ID do utilizador é obrigatório.' });
       }
-      const tarefas = await tarefasModel.listar(usuario_id);
+      const tarefas = await tarefasModel.listar(Number(usuario_id));
       return res.json(tarefas);
     } catch (error) {
       console.error('ERRO AO LISTAR TAREFAS:', error);
@@ -41,8 +41,8 @@ const tarefasController = {
 
       const novaTarefa = await tarefasModel.criar({
         texto: textoFinal,
-        coluna: coluna || 'afazer',
-        ordem: ordem || 0,
+        coluna: coluna || 'todo',
+        ordem: ordem !== undefined ? Number(ordem) : 0,
         usuario_id: Number(novoUsuarioId),
         prioridade_id: Number(prioridadeFinal),
         projeto_id: projeto_id ? Number(projeto_id) : null,
@@ -61,8 +61,8 @@ const tarefasController = {
     try {
       const { id } = req.params;
 
-      if (!id) {
-        return res.status(400).json({ erro: 'ID da tarefa é obrigatório.' });
+      if (!id || isNaN(Number(id))) {
+        return res.status(400).json({ erro: 'ID da tarefa válido é obrigatório.' });
       }
 
       const {
@@ -81,20 +81,22 @@ const tarefasController = {
         concluida
       } = req.body;
 
-      // Omohenda porã umi dato oúva Frontend guive oheja'ỹre NULL rei
       const dadosAtualizados = {
         texto: texto || titulo,
         coluna,
-        ordem,
-        usuario_id: usuario_id || usuarioId ? Number(usuario_id || usuarioId) : undefined,
-        prioridade_id: prioridade_id || idprioridade || prioridade ? Number(prioridade_id || idprioridade || prioridade) : undefined,
-        projeto_id: projeto_id ? Number(projeto_id) : null,
+        ordem: ordem !== undefined ? Number(ordem) : undefined,
+        usuario_id: (usuario_id || usuarioId) ? Number(usuario_id || usuarioId) : undefined,
+        prioridade_id: (prioridade_id || idprioridade || prioridade) ? Number(prioridade_id || idprioridade || prioridade) : undefined,
+        projeto_id: projeto_id ? Number(projeto_id) : undefined,
         cidade,
         cep,
         concluida
       };
 
-      const tarefaAtualizada = await tarefasModel.atualizar(id, dadosAtualizados);
+      // Omohenda ani ogueraha campo 'undefined'
+      Object.keys(dadosAtualizados).forEach(key => dadosAtualizados[key] === undefined && delete dadosAtualizados[key]);
+
+      const tarefaAtualizada = await tarefasModel.atualizar(Number(id), dadosAtualizados);
 
       if (!tarefaAtualizada) {
         return res.status(404).json({ erro: 'Tarefa não encontrada.' });
@@ -110,7 +112,12 @@ const tarefasController = {
   async deletar(req, res) {
     try {
       const { id } = req.params;
-      const tarefaDeletada = await tarefasModel.deletar(id);
+
+      if (!id || isNaN(Number(id))) {
+        return res.status(400).json({ erro: 'ID da tarefa válido é obrigatório.' });
+      }
+
+      const tarefaDeletada = await tarefasModel.deletar(Number(id));
 
       if (!tarefaDeletada) {
         return res.status(404).json({ erro: 'Tarefa não encontrada.' });
