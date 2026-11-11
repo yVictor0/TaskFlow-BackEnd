@@ -7,7 +7,7 @@ const pool = require('./src/database/db');
 
 // Documentação Swagger
 const swaggerUi = require('swagger-ui-express');
-const openapi = require('./src/docs/openapi');
+const openapi = require('./src/docs/openApi');
 
 // Rotas
 const tarefasR = require('./src/router/tarefas.routes');
