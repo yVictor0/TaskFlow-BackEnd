@@ -5,12 +5,18 @@ const cors = require('cors');
 
 const pool = require('./src/database/db');
 
+// Documentação Swagger
+const swaggerUi = require('swagger-ui-express');
+const openapi = require('./src/docs/openapi');
+
+// Rotas
 const tarefasR = require('./src/router/tarefas.routes');
 const usuariosR = require('./src/router/usuarios.routes');
 const projetosR = require('./src/router/projetos.routes');
-const prioridadeR  = require('./src/router/prioridade.routes');
+const prioridadeR = require('./src/router/prioridade.routes');
 const authRouters = require('./src/router/auth.routes');
 
+// Middlewares
 const logger = require('./src/middlewares/logger');
 const validarContentType = require('./src/middlewares/validarContentType');
 const autenticar = require('./src/middlewares/autenticar');
@@ -18,18 +24,22 @@ const tratarErros = require('./src/middlewares/erro.middleware');
 
 const app = express();
 
+// Configuração do CORS
 app.use(cors({
-  origin: process.env.CORS_ORIGIN, 
+  origin: process.env.CORS_ORIGIN || '*', 
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
 
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi));
+
 app.use(logger);
 app.use(validarContentType);
 
 app.use('/auth', authRouters);
+
 app.use('/tarefas', autenticar, tarefasR);
 app.use('/usuarios', autenticar, usuariosR);
 app.use('/projetos', autenticar, projetosR);
@@ -57,4 +67,7 @@ const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Documentação Swagger disponível em http://localhost:${PORT}/docs`);
 });
+
+module.exports = app
